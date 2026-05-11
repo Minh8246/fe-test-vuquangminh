@@ -6,6 +6,7 @@ import { DashboardPage } from '@/pages/DashboardPage';
 import { TasksPage } from '@/pages/TasksPage';
 import { AppLayout } from '@/app/Layout';
 import { ThemeProvider, useTheme } from '@/app/ThemeContext';
+import { UrlFiltersBridge } from '@/hooks/UrlFiltersBridge';
 
 function ThemedApp() {
   const { mode } = useTheme();
@@ -35,6 +36,7 @@ function ThemedApp() {
   return (
     <ConfigProvider locale={viVN} theme={themeConfig}>
       <AntdApp>
+        <UrlFiltersBridge />
         <Routes>
           <Route element={<AppLayout />}>
             <Route index element={<DashboardPage />} />
