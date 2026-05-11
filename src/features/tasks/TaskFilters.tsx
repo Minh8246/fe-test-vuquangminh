@@ -40,7 +40,7 @@ export function TaskFilters() {
   }, [filters.searchText]);
 
   return (
-    <div className="bg-white p-4 rounded-md shadow-sm space-y-3">
+    <div className="p-4 rounded-md shadow-sm space-y-3" style={{ background: 'var(--ant-color-bg-container)' }}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         <Input.Search
           placeholder="Tìm theo tiêu đề..."
