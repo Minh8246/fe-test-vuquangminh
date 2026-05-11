@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import { Button, DatePicker, Input, Select } from 'antd';
 import { ClearOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -11,42 +10,29 @@ import {
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { resetFilters, setFilter } from './tasksSlice';
 import { selectFilters } from './tasksSelectors';
-import { useDebounce } from '@/hooks/useDebounce';
 
 const { RangePicker } = DatePicker;
 
-export function TaskFilters() {
+interface TaskFiltersProps {
+  searchInput: string;
+  onSearchChange: (value: string) => void;
+}
+
+export function TaskFilters({ searchInput, onSearchChange }: TaskFiltersProps) {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectFilters);
-  const [searchInput, setSearchInput] = useState(filters.searchText);
-  const debouncedSearch = useDebounce(searchInput, 300);
-
-  // Ref tracks the last value we dispatched OR pulled in from the store,
-  // preventing a race where a stale debounced value re-applies after Reset.
-  const lastSyncedRef = useRef(filters.searchText);
-
-  useEffect(() => {
-    if (debouncedSearch !== lastSyncedRef.current) {
-      lastSyncedRef.current = debouncedSearch;
-      dispatch(setFilter({ searchText: debouncedSearch }));
-    }
-  }, [debouncedSearch, dispatch]);
-
-  useEffect(() => {
-    if (filters.searchText !== lastSyncedRef.current) {
-      lastSyncedRef.current = filters.searchText;
-      setSearchInput(filters.searchText);
-    }
-  }, [filters.searchText]);
 
   return (
-    <div className="p-4 rounded-md shadow-sm space-y-3" style={{ background: 'var(--ant-color-bg-container)' }}>
+    <div
+      className="p-4 rounded-md shadow-sm space-y-3"
+      style={{ background: 'var(--ant-color-bg-container)' }}
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         <Input.Search
           placeholder="Tìm theo tiêu đề..."
           allowClear
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+          onChange={(e) => onSearchChange(e.target.value)}
         />
         <Select<TaskStatus[]>
           mode="multiple"

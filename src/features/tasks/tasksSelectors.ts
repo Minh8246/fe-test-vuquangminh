@@ -13,7 +13,7 @@ export const selectFilteredTasks = createSelector(
     const search = searchText.trim().toLowerCase();
     const [from, to] = dateRange ?? [null, null];
     const fromTime = from ? new Date(from).getTime() : null;
-    const toTime = to ? new Date(to).getTime() : null;  
+    const toTime = to ? new Date(to).getTime() : null;
 
     return items.filter((task) => {
       if (search && !task.title.toLowerCase().includes(search)) {

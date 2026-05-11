@@ -1,21 +1,47 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { App, Button, Space, Typography } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import type { Task } from '@/types/task';
-import { useAppDispatch } from '@/store/hooks';
-import { deleteManyTasks } from '@/features/tasks/tasksSlice';
+import type { RootState } from '@/store';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { deleteManyTasks, setFilter } from '@/features/tasks/tasksSlice';
 import { TaskFilters } from '@/features/tasks/TaskFilters';
 import { TaskTable } from '@/features/tasks/TaskTable';
 import { TaskFormModal } from '@/features/tasks/TaskFormModal';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const { Title, Text } = Typography;
+
+const selectSearchText = (state: RootState) => state.tasks.filters.searchText;
 
 export function TasksPage() {
   const { modal } = App.useApp();
   const dispatch = useAppDispatch();
+  const searchText = useAppSelector(selectSearchText);
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const [searchInput, setSearchInput] = useState(searchText);
+  const debouncedSearch = useDebounce(searchInput, 300);
+  const lastSyncedRef = useRef(searchText);
+
+  useEffect(() => {
+    if (debouncedSearch !== lastSyncedRef.current) {
+      lastSyncedRef.current = debouncedSearch;
+      dispatch(setFilter({ searchText: debouncedSearch }));
+    }
+  }, [debouncedSearch, dispatch]);
+
+  useEffect(() => {
+    if (searchText !== lastSyncedRef.current) {
+      lastSyncedRef.current = searchText;
+      setSearchInput(searchText);
+    }
+  }, [searchText]);
+
+  const isSearching = searchInput !== searchText;
 
   const openCreate = () => {
     setEditingTask(undefined);
@@ -67,9 +93,13 @@ export function TasksPage() {
         </Space>
       </div>
 
-      <TaskFilters />
+      <TaskFilters
+        searchInput={searchInput}
+        onSearchChange={setSearchInput}
+      />
 
       <TaskTable
+        loading={isSearching}
         selectedRowKeys={selectedRowKeys}
         onSelectionChange={setSelectedRowKeys}
         onEdit={openEdit}

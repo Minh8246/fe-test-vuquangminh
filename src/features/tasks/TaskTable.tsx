@@ -17,12 +17,14 @@ interface TaskTableProps {
   selectedRowKeys: string[];
   onSelectionChange: (keys: string[]) => void;
   onEdit: (task: Task) => void;
+  loading?: boolean;
 }
 
 export function TaskTable({
   selectedRowKeys,
   onSelectionChange,
   onEdit,
+  loading = false,
 }: TaskTableProps) {
   const { modal } = App.useApp();
   const dispatch = useAppDispatch();
@@ -139,6 +141,7 @@ export function TaskTable({
       rowKey="id"
       columns={columns}
       dataSource={filtered}
+      loading={loading}
       scroll={{ x: 'max-content' }}
       rowSelection={{
         selectedRowKeys,
